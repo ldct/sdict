@@ -1,0 +1,17 @@
+{
+  "name": "sdict",
+  "version": "1.0.0",
+  "description": "",
+  "main": "split_cjk.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "deasync": "^0.1.4",
+    "mecab-ffi": "^0.1.0",
+    "mongodb": "^2.0.49",
+    "pg": "^4.4.3"
+  }
+}
