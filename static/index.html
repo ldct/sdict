@@ -1,0 +1,26 @@
+<html>
+<head>
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<body>
+<input id="searchQueryBox" style="width:80%"></input>
+<button id="search">Search</button>
+<pre id="results"></pre>
+
+
+<script>
+$("#search").click(function () {
+  var searchQuery = $("#searchQueryBox").val();
+  console.log(searchQuery);
+
+  $.get('/sentences/' + searchQuery, function (res, err) {
+    console.log(res);
+    $("#results").text(res.map(function (result) {
+      return result.sentence;
+    }).join('\n'));
+  });
+
+});
+</script>
+
+</html>

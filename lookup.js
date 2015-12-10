@@ -1,4 +1,4 @@
-var request = require('sync-request');
+// var request = require('sync-request');
 var db = require('./postgres');
 var dir = require('node-dir');
 var fs = require('fs');
