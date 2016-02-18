@@ -1,10 +1,11 @@
 var db = require('./postgres.js');
+var async = require('async');
 
-var query = db.client.query('SELECT * FROM sentences');
+var query = db.client.query('SELECT * FROM sentences LIMIT 50000');
 
 var processed = 0;
 
-s = new Set();
+s = {};
 
 query.on('error', function (err) {
   console.log('error: ', err);
@@ -12,13 +13,17 @@ query.on('error', function (err) {
 
 query.on('row', function (row) {
   processed += 1;
-  console.log(processed, s.size);
+  console.log(processed);
   row.keywords.forEach(function (keyword) {
-    s.add(keyword);
+    s[keyword] = 1;
   });
 });
 
 query.on('end', function () {
   console.log('end');
-  // console.log(s);
+  async.eachSeries(Object.keys(s), function (item, cb) {
+    db.runQuery('INSERT INTO keywords VALUES($1) ON CONFLICT DO NOTHING', [item], cb);
+  }, function (err) {
+    console.log(err);
+  });
 });
