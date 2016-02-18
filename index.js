@@ -20,7 +20,7 @@ app.use(express.static('static'));
 
 app.get('/sentences/:keyword', function (req, res) {
   var keyword = req.params.keyword;
-  db.runQuerySync('SELECT * FROM sentences WHERE keywords @> ARRAY[$1]',
+  db.runQuerySync('SELECT * FROM sentences WHERE keywords @> ARRAY[$1] LIMIT 100',
     [keyword], function (err, rows) {
       return res.json(rows);
     });
