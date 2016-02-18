@@ -12,6 +12,8 @@ client.connect(function (err) {
   console.log('PSQL is running');
 });
 
+exports.client = client;
+
 exports.runQuery = function(query, args, cb) {
   var query = client.query(query, args);
   var ret = [];
