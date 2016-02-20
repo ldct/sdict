@@ -6,10 +6,20 @@
 <input id="searchQueryBox" style="width:80%"></input>
 <button id="search">Search</button>
 <button id="random-keyword">Random Keyword</button>
+<pre id="autocomplete-results" style="border: 1px solid pink"></pre>
 <pre id="results"></pre>
 
 
 <script>
+
+$("#searchQueryBox").change(function () {
+  var searchQuery = $("#searchQueryBox").val();
+  $.get('/autocomplete/' + searchQuery, function (res, err) {
+    console.log(res);
+    $("#autocomplete-results").empty().append(res.join('\n'));
+  });
+});
+
 $("#search").click(function () {
   var searchQuery = $("#searchQueryBox").val();
   console.log(searchQuery);
