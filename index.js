@@ -26,6 +26,12 @@ app.get('/sentences/:keyword', function (req, res) {
     });
 });
 
+app.get('/random-keyword', function (req, res) {
+  db.runQuerySync('select keyword from keywords ORDER BY random() limit 1', [], function (err, rows) {
+    return res.json(rows[0]['keyword']);
+  });
+});
+
 var port = +process.argv[2] || 3000;
 server.listen(port, function() {
 

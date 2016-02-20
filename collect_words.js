@@ -1,7 +1,7 @@
 var db = require('./postgres.js');
 var async = require('async');
 
-var query = db.client.query('SELECT * FROM sentences LIMIT 50000');
+var query = db.client.query('SELECT * FROM sentences LIMIT 5000000');
 
 var processed = 0;
 

@@ -5,6 +5,7 @@
 <body>
 <input id="searchQueryBox" style="width:80%"></input>
 <button id="search">Search</button>
+<button id="random-keyword">Random Keyword</button>
 <pre id="results"></pre>
 
 
@@ -21,6 +22,15 @@ $("#search").click(function () {
   });
 
 });
+
+$("#random-keyword").click(function () {
+  $.get('/random-keyword', function (res, err) {
+    console.log(res);
+    $("#searchQueryBox").val(res);
+    $("#search").click();
+  });
+});
+
 </script>
 
 </html>
