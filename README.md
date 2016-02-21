@@ -1,5 +1,10 @@
 # sdict
-sdict
+
+The Japanese Sentences Dictionary
+
+## How big is it?
+
+![screenshot](http://i.imgur.com/pGK1Nyi.png)
 
 ## Interactive
 
