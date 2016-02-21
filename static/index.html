@@ -15,12 +15,10 @@
 $("#searchQueryBox").keyup(function () {
   var searchQuery = $("#searchQueryBox").val();
   $.get('/autocomplete/' + searchQuery, function (res, err) {
-    console.log(res);
     $("#autocomplete-results").empty();
     res.forEach(function (word) {
       var autocomplete_entry = $("<div>", { text: word });
       autocomplete_entry.click(function (e) {
-        console.log($(e.currentTarget).text());
         $("#searchQueryBox").val($(e.currentTarget).text());
         $("#search").click();
         $("#searchQueryBox").keyup();
@@ -32,10 +30,7 @@ $("#searchQueryBox").keyup(function () {
 
 $("#search").click(function () {
   var searchQuery = $("#searchQueryBox").val();
-  console.log(searchQuery);
-
   $.get('/sentences/' + searchQuery, function (res, err) {
-    console.log(res);
     $("#results").empty();
     res.forEach(function (sentence) {
       $("#results").append($("<div>", { text: sentence.sentence, "class": "sentence", "style": "margin: 0" } ));
@@ -46,7 +41,6 @@ $("#search").click(function () {
 
 $("#random-keyword").click(function () {
   $.get('/random-keyword', function (res, err) {
-    console.log(res);
     $("#searchQueryBox").val(res);
     $("#search").click();
   });
