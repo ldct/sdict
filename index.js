@@ -35,7 +35,7 @@ app.get('/random-keyword', function (req, res) {
 app.get('/autocomplete/:prefix', function (req, res) {
   var prefix = req.params.prefix;
   console.log(prefix);
-  db.runQuerySync("select keyword from keywords where to_tsvector(keyword) @@ to_tsquery($1) LIMIT 10", 
+  db.runQuerySync("select keyword from keywords where tsvector(keyword) @@ to_tsquery($1) LIMIT 10", 
     [prefix + ':*'], function (err, rows) {
       if (err) console.log(err);
       return res.json(rows.map(function (row) { return row.keyword }));

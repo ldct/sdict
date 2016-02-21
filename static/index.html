@@ -6,17 +6,27 @@
 <input id="searchQueryBox" style="width:80%"></input>
 <button id="search">Search</button>
 <button id="random-keyword">Random Keyword</button>
-<pre id="autocomplete-results" style="border: 1px solid pink"></pre>
-<pre id="results"></pre>
+<div id="autocomplete-results" style="border: 1px solid lightgray; margin-bottom: 5px"></div>
+<div id="results"></div>
 
 
 <script>
 
-$("#searchQueryBox").change(function () {
+$("#searchQueryBox").keyup(function () {
   var searchQuery = $("#searchQueryBox").val();
   $.get('/autocomplete/' + searchQuery, function (res, err) {
     console.log(res);
-    $("#autocomplete-results").empty().append(res.join('\n'));
+    $("#autocomplete-results").empty();
+    res.forEach(function (word) {
+      var autocomplete_entry = $("<div>", { text: word });
+      autocomplete_entry.click(function (e) {
+        console.log($(e.currentTarget).text());
+        $("#searchQueryBox").val($(e.currentTarget).text());
+        $("#search").click();
+        $("#searchQueryBox").keyup();
+      });
+      $("#autocomplete-results").append(autocomplete_entry);
+    });
   });
 });
 
@@ -26,9 +36,10 @@ $("#search").click(function () {
 
   $.get('/sentences/' + searchQuery, function (res, err) {
     console.log(res);
-    $("#results").text(res.map(function (result) {
-      return result.sentence;
-    }).join('\n'));
+    $("#results").empty();
+    res.forEach(function (sentence) {
+      $("#results").append($("<div>", { text: sentence.sentence, "class": "sentence", "style": "margin: 0" } ));
+    });
   });
 
 });
