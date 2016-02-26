@@ -12,3 +12,7 @@ The Japanese Sentences Dictionary
 sudo -i -u postgres
 /usr/local/pgsql/bin/psql 
 ```
+
+```
+node_modules/browserify/bin/cmd.js -t [ babelify --presets [ react ] ] main.jsx -o static/bundle.js
+```
