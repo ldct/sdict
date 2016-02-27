@@ -3,8 +3,25 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var AutocompleteEntry = React.createClass({
+  getInitialState: function () {
+    return {hover: false};
+  },
+  handleMouseOver: function () {
+    this.setState({hover: true});
+  },
+  handleMouseOut: function () {
+    this.setState({hover: false});
+  },
   render: function () {
-    return <div> {this.props.term} </div>
+    return <div 
+      style={{
+        backgroundColor: this.state.hover ? 'lightgrey' : 'transparent',
+        width: "100%"
+      }}
+      onMouseOver={this.handleMouseOver}
+      onMouseOut={this.handleMouseOut}
+      onClick={this.props.onClick}
+    > {this.props.term} </div>
   }
 });
 
@@ -22,10 +39,11 @@ var AutocompleteResults = React.createClass({
         border: '1px solid lightgrey',
         marginBottom: '1px'
       }}> { autocompleteResults.map(function (res) {
-        return <div
+        return <AutocompleteEntry
           key={res}
+          term={res}
           onClick={self.handleSelect.bind(self, res)}
-        >{res}</div>;
+        />
       })} </div>
     }
   }
@@ -43,7 +61,7 @@ var SearchResults = React.createClass({
         return result.sentence;
       });
       return <div> 
-        {sentences.length} results
+        <pre>{sentences.length} results</pre>
         {sentences.map(function (sentence, i) {
           return <div key={i}> {sentence} </div>
         })} 
@@ -106,29 +124,33 @@ var App = React.createClass({
     });
   },
   render: function () {
+    var buttonStyle = {
+      marginLeft: 5,
+    };
     return <div>
-      <input 
-        id="searchQueryBox" 
-        ref="searchQueryBox"
-        style={{width: "80%"}}
-        defaultValue={this.state.searchTerm}
-        onKeyUp={this.handleQueryKeyUp}
-      />
+      <div style={{width: "80%", display: "inline-block"}}>
+        <input 
+          id="searchQueryBox" 
+          ref="searchQueryBox"
+          style={{width: "100%"}}
+          defaultValue={this.state.searchTerm}
+          onKeyUp={this.handleQueryKeyUp}
+        />
+        <AutocompleteResults
+        autocompleteResults = {this.state.autocompleteResults}
+        onSelectResult = {this.handleSelectAutocompleteResult} />
+      </div>
       <button 
-        id="search"
+        style={buttonStyle}
         ref="searchButton"
+        disabled={this.state.searchTerm.length === 0}
         onClick={this.handleSearchClick}
       >Search</button>
       <button
-        id="random-keyword"
+        style={buttonStyle}
         onClick={this.handleRandomKeywordClick}
       >Random</button>
-      <AutocompleteResults 
-        autocompleteResults = {this.state.autocompleteResults}
-        onSelectResult = {this.handleSelectAutocompleteResult} />
       <SearchResults searchResults = {this.state.searchResults} />
-
-      <pre> {JSON.stringify(this.state)} </pre>
 
     </div>
   }

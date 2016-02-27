@@ -6,10 +6,27 @@ var ReactDOM = require('react-dom');
 var AutocompleteEntry = React.createClass({
   displayName: 'AutocompleteEntry',
 
+  getInitialState: function () {
+    return { hover: false };
+  },
+  handleMouseOver: function () {
+    this.setState({ hover: true });
+  },
+  handleMouseOut: function () {
+    this.setState({ hover: false });
+  },
   render: function () {
     return React.createElement(
       'div',
-      null,
+      {
+        style: {
+          backgroundColor: this.state.hover ? 'lightgrey' : 'transparent',
+          width: "100%"
+        },
+        onMouseOver: this.handleMouseOver,
+        onMouseOut: this.handleMouseOut,
+        onClick: this.props.onClick
+      },
       ' ',
       this.props.term,
       ' '
@@ -37,14 +54,11 @@ var AutocompleteResults = React.createClass({
           } },
         ' ',
         autocompleteResults.map(function (res) {
-          return React.createElement(
-            'div',
-            {
-              key: res,
-              onClick: self.handleSelect.bind(self, res)
-            },
-            res
-          );
+          return React.createElement(AutocompleteEntry, {
+            key: res,
+            term: res,
+            onClick: self.handleSelect.bind(self, res)
+          });
         }),
         ' '
       );
@@ -72,8 +86,12 @@ var SearchResults = React.createClass({
       return React.createElement(
         'div',
         null,
-        sentences.length,
-        ' results',
+        React.createElement(
+          'pre',
+          null,
+          sentences.length,
+          ' results'
+        ),
         sentences.map(function (sentence, i) {
           return React.createElement(
             'div',
@@ -144,21 +162,32 @@ var App = React.createClass({
     });
   },
   render: function () {
+    var buttonStyle = {
+      marginLeft: 5
+    };
     return React.createElement(
       'div',
       null,
-      React.createElement('input', {
-        id: 'searchQueryBox',
-        ref: 'searchQueryBox',
-        style: { width: "80%" },
-        defaultValue: this.state.searchTerm,
-        onKeyUp: this.handleQueryKeyUp
-      }),
+      React.createElement(
+        'div',
+        { style: { width: "80%", display: "inline-block" } },
+        React.createElement('input', {
+          id: 'searchQueryBox',
+          ref: 'searchQueryBox',
+          style: { width: "100%" },
+          defaultValue: this.state.searchTerm,
+          onKeyUp: this.handleQueryKeyUp
+        }),
+        React.createElement(AutocompleteResults, {
+          autocompleteResults: this.state.autocompleteResults,
+          onSelectResult: this.handleSelectAutocompleteResult })
+      ),
       React.createElement(
         'button',
         {
-          id: 'search',
+          style: buttonStyle,
           ref: 'searchButton',
+          disabled: this.state.searchTerm.length === 0,
           onClick: this.handleSearchClick
         },
         'Search'
@@ -166,22 +195,12 @@ var App = React.createClass({
       React.createElement(
         'button',
         {
-          id: 'random-keyword',
+          style: buttonStyle,
           onClick: this.handleRandomKeywordClick
         },
         'Random'
       ),
-      React.createElement(AutocompleteResults, {
-        autocompleteResults: this.state.autocompleteResults,
-        onSelectResult: this.handleSelectAutocompleteResult }),
-      React.createElement(SearchResults, { searchResults: this.state.searchResults }),
-      React.createElement(
-        'pre',
-        null,
-        ' ',
-        JSON.stringify(this.state),
-        ' '
-      )
+      React.createElement(SearchResults, { searchResults: this.state.searchResults })
     );
   }
 });
