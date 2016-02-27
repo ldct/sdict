@@ -24,10 +24,10 @@ var SearchResults = React.createClass({
         'div',
         null,
         ' ',
-        sentences.map(function (sentence) {
+        sentences.map(function (sentence, i) {
           return React.createElement(
             'div',
-            null,
+            { key: i },
             ' ',
             sentence,
             ' '
@@ -64,22 +64,44 @@ var App = React.createClass({
     });
     console.log('click');
   },
+  handleRandomKeywordClick: function () {
+    var self = this;
+    $.get('/random-keyword', function (res, err) {
+      $(self.refs.searchQueryBox).val(res);
+      self.setState({
+        searchTerm: res
+      }, function () {
+        $(self.refs.searchButton).click();
+      });
+    });
+  },
   render: function () {
     return React.createElement(
       'div',
       null,
       React.createElement('input', {
         id: 'searchQueryBox',
+        ref: 'searchQueryBox',
         style: { width: "80%" },
+        defaultValue: this.state.searchTerm,
         onKeyUp: this.handleQueryKeyUp
       }),
       React.createElement(
         'button',
         {
           id: 'search',
+          ref: 'searchButton',
           onClick: this.handleSearchClick
         },
         'Search'
+      ),
+      React.createElement(
+        'button',
+        {
+          id: 'random-keyword',
+          onClick: this.handleRandomKeywordClick
+        },
+        'Random'
       ),
       React.createElement(SearchResults, { searchResults: this.state.searchResults }),
       React.createElement(

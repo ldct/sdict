@@ -13,8 +13,8 @@ var SearchResults = React.createClass({
       var sentences = this.props.searchResults.map(function (result) {
         return result.sentence;
       });
-      return <div> {sentences.map(function (sentence) {
-        return <div> {sentence} </div>
+      return <div> {sentences.map(function (sentence, i) {
+        return <div key={i}> {sentence} </div>
       })} </div>
     }
   }
@@ -43,18 +43,35 @@ var App = React.createClass({
     });
     console.log('click');
   },
+  handleRandomKeywordClick: function () {
+    var self = this;
+    $.get('/random-keyword', function (res, err) {
+      $(self.refs.searchQueryBox).val(res);
+      self.setState({
+        searchTerm: res
+      }, function () {
+        $(self.refs.searchButton).click();
+      });
+    });
+  },
   render: function () {
     return <div>
       <input 
         id="searchQueryBox" 
+        ref="searchQueryBox"
         style={{width: "80%"}}
+        defaultValue={this.state.searchTerm}
         onKeyUp={this.handleQueryKeyUp}
       />
       <button 
         id="search"
+        ref="searchButton"
         onClick={this.handleSearchClick}
       >Search</button>
- 
+      <button
+        id="random-keyword"
+        onClick={this.handleRandomKeywordClick}
+      >Random</button> 
       <SearchResults searchResults = {this.state.searchResults} />
 
       <pre> {JSON.stringify(this.state)} </pre>
