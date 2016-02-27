@@ -3,11 +3,97 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-ReactDOM.render(React.createElement(
-  'h1',
-  null,
-  'Hello, world!'
-), document.getElementById('container'));
+var SearchResults = React.createClass({
+  displayName: 'SearchResults',
+
+  render: function () {
+    var searchResults = this.props.searchResults;
+    if (searchResults === null || searchResults === undefined) {
+      return null;
+    } else if (searchResults.length && searchResults.length === 0) {
+      return React.createElement(
+        'div',
+        null,
+        ' No Results '
+      );
+    } else {
+      var sentences = this.props.searchResults.map(function (result) {
+        return result.sentence;
+      });
+      return React.createElement(
+        'div',
+        null,
+        ' ',
+        sentences.map(function (sentence) {
+          return React.createElement(
+            'div',
+            null,
+            ' ',
+            sentence,
+            ' '
+          );
+        }),
+        ' '
+      );
+    }
+  }
+});
+
+var App = React.createClass({
+  displayName: 'App',
+
+  getInitialState: function () {
+    return {
+      searchTerm: ''
+    };
+  },
+  handleQueryKeyUp: function (e) {
+    e.persist();
+    this.setState({
+      searchTerm: e.target.value
+    });
+  },
+  handleSearchClick: function () {
+    var self = this;
+    $.get('/sentences/' + self.state.searchTerm, function (res, err) {
+      if (err) console.log('error', err);
+      console.log(res);
+      self.setState({
+        searchResults: res
+      });
+    });
+    console.log('click');
+  },
+  render: function () {
+    return React.createElement(
+      'div',
+      null,
+      React.createElement('input', {
+        id: 'searchQueryBox',
+        style: { width: "80%" },
+        onKeyUp: this.handleQueryKeyUp
+      }),
+      React.createElement(
+        'button',
+        {
+          id: 'search',
+          onClick: this.handleSearchClick
+        },
+        'Search'
+      ),
+      React.createElement(SearchResults, { searchResults: this.state.searchResults }),
+      React.createElement(
+        'pre',
+        null,
+        ' ',
+        JSON.stringify(this.state),
+        ' '
+      )
+    );
+  }
+});
+
+ReactDOM.render(React.createElement(App, null), document.getElementById('container'));
 
 },{"react":159,"react-dom":30}],2:[function(require,module,exports){
 (function (process){
