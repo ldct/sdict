@@ -2,17 +2,30 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var AutocompleteEntry = React.createClass({
+  render: function () {
+    return <div> {this.props.term} </div>
+  }
+});
+
 var AutocompleteResults = React.createClass({
+  handleSelect: function (res) {
+    this.props.onSelectResult(res);
+  },
   render: function () {
     var autocompleteResults = this.props.autocompleteResults;
     if (!autocompleteResults || autocompleteResults.length === 0) {
       return null;
     } else {
+      var self = this;
       return <div style={{
         border: '1px solid lightgrey',
         marginBottom: '1px'
       }}> { autocompleteResults.map(function (res) {
-        return <div key={res}> {res} </div>;
+        return <div
+          key={res}
+          onClick={self.handleSelect.bind(self, res)}
+        >{res}</div>;
       })} </div>
     }
   }
@@ -46,12 +59,14 @@ var App = React.createClass({
     }
   },
   handleQueryKeyUp: function (e) {
-    e.persist();
+    this.handleQueryEntered(e.target.value);
+  },
+  handleQueryEntered: function (query) {
     this.setState({
-      searchTerm: e.target.value,
+      searchTerm: query,
     });
     var self = this;
-    $.get('/autocomplete/' + e.target.value, function (res, err) {
+    $.get('/autocomplete/' + query, function (res, err) {
       console.log(res);
       if (res.prefix === self.state.searchTerm) {
         self.setState({
@@ -80,6 +95,16 @@ var App = React.createClass({
       });
     });
   },
+  handleSelectAutocompleteResult: function (result) {
+    var self = this;
+    $(self.refs.searchQueryBox).val(result);
+    self.setState({
+      searchTerm: result,
+      autocompleteResults: []
+    }, function () {
+      $(self.refs.searchButton).click();
+    });
+  },
   render: function () {
     return <div>
       <input 
@@ -98,7 +123,9 @@ var App = React.createClass({
         id="random-keyword"
         onClick={this.handleRandomKeywordClick}
       >Random</button>
-      <AutocompleteResults autocompleteResults = {this.state.autocompleteResults} /> 
+      <AutocompleteResults 
+        autocompleteResults = {this.state.autocompleteResults}
+        onSelectResult = {this.handleSelectAutocompleteResult} />
       <SearchResults searchResults = {this.state.searchResults} />
 
       <pre> {JSON.stringify(this.state)} </pre>

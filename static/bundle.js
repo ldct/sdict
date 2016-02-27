@@ -3,14 +3,32 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var AutocompleteEntry = React.createClass({
+  displayName: 'AutocompleteEntry',
+
+  render: function () {
+    return React.createElement(
+      'div',
+      null,
+      ' ',
+      this.props.term,
+      ' '
+    );
+  }
+});
+
 var AutocompleteResults = React.createClass({
   displayName: 'AutocompleteResults',
 
+  handleSelect: function (res) {
+    this.props.onSelectResult(res);
+  },
   render: function () {
     var autocompleteResults = this.props.autocompleteResults;
     if (!autocompleteResults || autocompleteResults.length === 0) {
       return null;
     } else {
+      var self = this;
       return React.createElement(
         'div',
         { style: {
@@ -21,10 +39,11 @@ var AutocompleteResults = React.createClass({
         autocompleteResults.map(function (res) {
           return React.createElement(
             'div',
-            { key: res },
-            ' ',
-            res,
-            ' '
+            {
+              key: res,
+              onClick: self.handleSelect.bind(self, res)
+            },
+            res
           );
         }),
         ' '
@@ -78,12 +97,14 @@ var App = React.createClass({
     };
   },
   handleQueryKeyUp: function (e) {
-    e.persist();
+    this.handleQueryEntered(e.target.value);
+  },
+  handleQueryEntered: function (query) {
     this.setState({
-      searchTerm: e.target.value
+      searchTerm: query
     });
     var self = this;
-    $.get('/autocomplete/' + e.target.value, function (res, err) {
+    $.get('/autocomplete/' + query, function (res, err) {
       console.log(res);
       if (res.prefix === self.state.searchTerm) {
         self.setState({
@@ -110,6 +131,16 @@ var App = React.createClass({
       }, function () {
         $(self.refs.searchButton).click();
       });
+    });
+  },
+  handleSelectAutocompleteResult: function (result) {
+    var self = this;
+    $(self.refs.searchQueryBox).val(result);
+    self.setState({
+      searchTerm: result,
+      autocompleteResults: []
+    }, function () {
+      $(self.refs.searchButton).click();
     });
   },
   render: function () {
@@ -140,7 +171,9 @@ var App = React.createClass({
         },
         'Random'
       ),
-      React.createElement(AutocompleteResults, { autocompleteResults: this.state.autocompleteResults }),
+      React.createElement(AutocompleteResults, {
+        autocompleteResults: this.state.autocompleteResults,
+        onSelectResult: this.handleSelectAutocompleteResult }),
       React.createElement(SearchResults, { searchResults: this.state.searchResults }),
       React.createElement(
         'pre',
