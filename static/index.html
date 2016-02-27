@@ -24,7 +24,7 @@ $("#searchQueryBox").keyup(function () {
   var searchQuery = $("#searchQueryBox").val();
   $.get('/autocomplete/' + searchQuery, function (res, err) {
     $("#autocomplete-results").empty();
-    res.forEach(function (word) {
+    res.results.forEach(function (word) {
       var autocomplete_entry = $("<div>", { text: word });
       autocomplete_entry.click(function (e) {
         $("#searchQueryBox").val($(e.currentTarget).text());

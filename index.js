@@ -38,7 +38,10 @@ app.get('/autocomplete/:prefix', function (req, res) {
   db.runQuerySync("select keyword from keywords where tsvector(keyword) @@ to_tsquery($1) LIMIT 10", 
     [prefix + ':*'], function (err, rows) {
       if (err) console.log(err);
-      return res.json(rows.map(function (row) { return row.keyword }));
+      return res.json({
+        'results': rows.map(function (row) { return row.keyword }),
+        'prefix': prefix
+      });
     });
 });
 

@@ -41,7 +41,6 @@ var App = React.createClass({
         searchResults: res
       }); 
     });
-    console.log('click');
   },
   handleRandomKeywordClick: function () {
     var self = this;
