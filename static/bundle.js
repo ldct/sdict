@@ -3,6 +3,36 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var AutocompleteResults = React.createClass({
+  displayName: 'AutocompleteResults',
+
+  render: function () {
+    var autocompleteResults = this.props.autocompleteResults;
+    if (!autocompleteResults || autocompleteResults.length === 0) {
+      return null;
+    } else {
+      return React.createElement(
+        'div',
+        { style: {
+            border: '1px solid lightgrey',
+            marginBottom: '1px'
+          } },
+        ' ',
+        autocompleteResults.map(function (res) {
+          return React.createElement(
+            'div',
+            { key: res },
+            ' ',
+            res,
+            ' '
+          );
+        }),
+        ' '
+      );
+    }
+  }
+});
+
 var SearchResults = React.createClass({
   displayName: 'SearchResults',
 
@@ -23,7 +53,8 @@ var SearchResults = React.createClass({
       return React.createElement(
         'div',
         null,
-        ' ',
+        sentences.length,
+        ' results',
         sentences.map(function (sentence, i) {
           return React.createElement(
             'div',
@@ -32,8 +63,7 @@ var SearchResults = React.createClass({
             sentence,
             ' '
           );
-        }),
-        ' '
+        })
       );
     }
   }
@@ -52,17 +82,24 @@ var App = React.createClass({
     this.setState({
       searchTerm: e.target.value
     });
+    var self = this;
+    $.get('/autocomplete/' + e.target.value, function (res, err) {
+      console.log(res);
+      if (res.prefix === self.state.searchTerm) {
+        self.setState({
+          autocompleteResults: res.results
+        });
+      }
+    });
   },
   handleSearchClick: function () {
     var self = this;
     $.get('/sentences/' + self.state.searchTerm, function (res, err) {
-      if (err) console.log('error', err);
-      console.log(res);
+      if (err !== 'success') console.log('error', err);
       self.setState({
         searchResults: res
       });
     });
-    console.log('click');
   },
   handleRandomKeywordClick: function () {
     var self = this;
@@ -103,6 +140,7 @@ var App = React.createClass({
         },
         'Random'
       ),
+      React.createElement(AutocompleteResults, { autocompleteResults: this.state.autocompleteResults }),
       React.createElement(SearchResults, { searchResults: this.state.searchResults }),
       React.createElement(
         'pre',

@@ -2,6 +2,22 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var AutocompleteResults = React.createClass({
+  render: function () {
+    var autocompleteResults = this.props.autocompleteResults;
+    if (!autocompleteResults || autocompleteResults.length === 0) {
+      return null;
+    } else {
+      return <div style={{
+        border: '1px solid lightgrey',
+        marginBottom: '1px'
+      }}> { autocompleteResults.map(function (res) {
+        return <div key={res}> {res} </div>;
+      })} </div>
+    }
+  }
+});
+
 var SearchResults = React.createClass({
   render: function () {
     var searchResults = this.props.searchResults;
@@ -13,9 +29,12 @@ var SearchResults = React.createClass({
       var sentences = this.props.searchResults.map(function (result) {
         return result.sentence;
       });
-      return <div> {sentences.map(function (sentence, i) {
-        return <div key={i}> {sentence} </div>
-      })} </div>
+      return <div> 
+        {sentences.length} results
+        {sentences.map(function (sentence, i) {
+          return <div key={i}> {sentence} </div>
+        })} 
+      </div>
     }
   }
 });
@@ -31,12 +50,20 @@ var App = React.createClass({
     this.setState({
       searchTerm: e.target.value,
     });
+    var self = this;
+    $.get('/autocomplete/' + e.target.value, function (res, err) {
+      console.log(res);
+      if (res.prefix === self.state.searchTerm) {
+        self.setState({
+          autocompleteResults: res.results
+        });
+      }
+    });
   },
   handleSearchClick: function () {
     var self = this;
     $.get('/sentences/' + self.state.searchTerm, function (res, err) {
-      if (err) console.log('error', err);
-      console.log(res);
+      if (err !== 'success') console.log('error', err);
       self.setState({
         searchResults: res
       }); 
@@ -70,7 +97,8 @@ var App = React.createClass({
       <button
         id="random-keyword"
         onClick={this.handleRandomKeywordClick}
-      >Random</button> 
+      >Random</button>
+      <AutocompleteResults autocompleteResults = {this.state.autocompleteResults} /> 
       <SearchResults searchResults = {this.state.searchResults} />
 
       <pre> {JSON.stringify(this.state)} </pre>
