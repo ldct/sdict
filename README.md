@@ -11,6 +11,7 @@ The Japanese Sentences Dictionary
 ```
 sudo -i -u postgres
 /usr/local/pgsql/bin/psql 
+\c sdict
 ```
 
 ```
